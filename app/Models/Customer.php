@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Customer extends Model
 {
@@ -22,13 +23,13 @@ class Customer extends Model
         ];
     }
 
-    // /**
-    //  * Get the customer's subscriptions.
-    //  *
-    //  * @return HasMany<Subscription, $this>
-    //  */
-    // public function subscriptions()
-    // {
-    //     return $this->hasMany(Subscription::class);
-    // }
+    /**
+     * Get the customer's subscriptions.
+     *
+     * @return HasMany<Subscription, $this>
+     */
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
 }

@@ -123,13 +123,13 @@ class CustomerController extends Controller
         }
 
         // Proteksi relasi: Jika customer memiliki data subscription, jangan diperbolehkan hapus
-        // if ($customer->subscriptions()->exists()) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Customer cannot be deleted because it has subscriptions',
-        //         'errors' => [],
-        //     ], 422);
-        // }
+        if ($customer->subscriptions()->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer cannot be deleted because it has subscriptions',
+                'errors' => [],
+            ], 422);
+        }
 
         $customer->delete();
 
