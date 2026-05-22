@@ -9,25 +9,10 @@ use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
-        $status = $request->query('status');
+        $services = Service::all();
 
-        $query = Service::query();
-
-        if ($status !== null) {
-            if (!in_array($status, ['active', 'inactive'], true)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Validation failed",
-                    'errors' => [
-                        'status' => ["The selected status is invalid."],
-                    ],
-                ], 422);
-            }
-            $query->where('status', $status === 'active');
-        }
-        $services = $query->latest()->get();
         return response()->json([
             'success' => true,
             'message' => "Services retrieved successfully",
@@ -121,6 +106,57 @@ class ServiceController extends Controller
         return response()->json([
             'success' => true,
             'message' => "Service deleted successfully",
+        ]);
+    }
+
+    public function getServiceById(int $service): JsonResponse
+    {
+        $service = Service::find($service);
+
+        if (!$service) {
+            return response()->json([
+                'success' => false,
+                'message' => "Service not found",
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "Service retrieved successfully",
+            'data' => $service,
+        ]);
+    }
+
+    public function getServiceByStatus(Request $request): JsonResponse
+    {
+        $status = $request->query('status');
+
+        if ($status === null) {
+            return response()->json([
+                'success' => false,
+                'message' => "Status parameter is required",
+            ], 400);
+        }
+
+        if (!in_array($status, ['active', 'inactive'], true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => [
+                    'status' => ['The selected status is invalid.']
+                ]
+            ], 422);
+        }
+
+        $service = Service::query()
+            ->where('status', $status === 'active')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Services with status '{$status}' retrieved successfully",
+            'data' => $service,
         ]);
     }
 
