@@ -1,7 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\ServiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::apiResource('services', ServiceController::class);
 Route::patch("services/{service}/change-status", [ServiceController::class, 'changeServiceStatus']);
+
+// Customer routes
+Route::apiResource('customers', CustomerController::class);
