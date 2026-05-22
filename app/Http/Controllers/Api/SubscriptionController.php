@@ -60,6 +60,8 @@ class SubscriptionController extends Controller
             ], 404);
         }
 
+        $subscription->makeHidden(['customer', 'service']);
+
         return response()->json([
             'success' => true,
             'message' => 'Subscription retrieved successfully',
@@ -67,8 +69,9 @@ class SubscriptionController extends Controller
         ]);
     }
 
-    public function getSubscriptionByStatus(string $status): JsonResponse
+    public function getSubscriptionByStatus(Request $request): JsonResponse
     {
+        $status = $request->query('status');
         $allowedStatus = ['active', 'inactive', 'trial', 'isolir', 'dismantle'];
 
         if (!in_array($status, $allowedStatus, true)) {
@@ -88,6 +91,32 @@ class SubscriptionController extends Controller
             'success' => true,
             'message' => "Subscriptions with status '{$status}' retrieved successfully",
             'data' => $subscriptions,
+        ]);
+    }
+
+    public function changeSubscriptionStatus(int $subscription, Request $request): JsonResponse
+    {
+        $subscription = Subscription::query()->find($subscription);
+
+        if (!$subscription) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Subscription not found',
+                'errors' => [],
+            ], 404);
+        }
+
+        $data = $request->validate([
+            'status' => ['required', 'string', Rule::in(['active', 'inactive', 'trial', 'isolir', 'dismantle'])],
+        ]);
+
+        $subscription->update(['status' => $data['status']]);
+        $subscription->makeHidden(['customer', 'service']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Subscription status updated successfully',
+            'data' => $subscription,
         ]);
     }
 }
