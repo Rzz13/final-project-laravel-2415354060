@@ -109,24 +109,6 @@ class ServiceController extends Controller
         ]);
     }
 
-    public function getServiceById(int $service): JsonResponse
-    {
-        $service = Service::find($service);
-
-        if (!$service) {
-            return response()->json([
-                'success' => false,
-                'message' => "Service not found",
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => "Service retrieved successfully",
-            'data' => $service,
-        ]);
-    }
-
     public function getServiceByStatus(Request $request): JsonResponse
     {
         $status = $request->query('status');
