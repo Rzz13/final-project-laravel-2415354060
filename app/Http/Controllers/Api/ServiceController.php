@@ -135,11 +135,16 @@ class ServiceController extends Controller
             ], 404);
         }
 
-        $validated = $request->validate([
-            'status' => ['required', 'boolean'],
-        ]);
+        $status = $request->query('status');
 
-        $service->update(['status' => $validated['status']]);
+        if ($status === null) {
+            return response()->json([
+                'success' => false,
+                'message' => "Status parameter is required",
+            ], 400);
+        }
+
+        $service->update(['status' => $status === 'true']);
 
         return response()->json([
             'success' => true,
