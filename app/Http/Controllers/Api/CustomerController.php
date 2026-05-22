@@ -1,38 +1,172 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $customers = Customer::latest()->get();
+        $status = $request->query('status');
+        $query = Customer::query();
+
+        if ($status !== null) {
+            if (!in_array($status, ['active', 'inactive'], true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => [
+                        'status' => ['The selected status is invalid.']
+                    ]
+                ], 422);
+            }
+
+            $query->where('status', $status === 'active');
+        }
+
+        $customers = $query->latest()->get();
+
         return response()->json([
             'success' => true,
-            'message' => "Customers retrieved successfully",
+            'message' => 'Customers retrieved successfully',
             'data' => $customers,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string'],
-            'email' => ['required', 'email', 'unique:customers,email'],
-            'phone' => ['nullable', 'string'],
-            'address' => ['nullable', 'text'],
+        $data = $request->validate([
+            'customer_id' => ['required', 'string', 'unique:customers,customer_id'],
+            'name'        => ['required', 'string'],
+            'email'       => ['nullable', 'string', 'email', 'unique:customers,email'],
+            'phone'       => ['nullable', 'string'],
+            'address'     => ['nullable', 'string'],
+            'status'      => ['nullable', 'boolean'],
         ]);
 
-        $customer = Customer::create($validated);
+        $data['status'] = $data['status'] ?? true;
+
+        $customer = Customer::query()->create($data);
 
         return response()->json([
             'success' => true,
-            'message' => "Customer created successfully",
+            'message' => 'Customer created successfully',
             'data' => $customer,
         ], 201);
+    }
+
+    public function show(int $customer): JsonResponse
+    {
+        $customer = Customer::query()->find($customer);
+
+        if (!$customer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer not found',
+                'errors' => [],
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Customer retrieved successfully',
+            'data' => $customer,
+        ]);
+    }
+
+    public function update(Request $request, int $customer): JsonResponse
+    {
+        $customer = Customer::query()->find($customer);
+
+        if (!$customer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer not found',
+                'errors' => [],
+            ], 404);
+        }
+
+        $data = $request->validate([
+            'customer_id' => ['sometimes', 'string', 'unique:customers,customer_id,' . $customer->id],
+            'name'        => ['sometimes', 'string'],
+            'email'       => ['nullable', 'string', 'email', 'unique:customers,email,' . $customer->id],
+            'phone'       => ['nullable', 'string'],
+            'address'     => ['nullable', 'string'],
+            'status'      => ['nullable', 'boolean'],
+        ]);
+
+        $customer->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Customer updated successfully',
+            'data' => $customer,
+        ]);
+    }
+
+    public function destroy(int $customer): JsonResponse
+    {
+        $customer = Customer::query()->find($customer);
+
+        if (!$customer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer not found',
+                'errors' => [],
+            ], 404);
+        }
+
+        // Proteksi relasi: Jika customer memiliki data subscription, jangan diperbolehkan hapus
+        // if ($customer->subscriptions()->exists()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Customer cannot be deleted because it has subscriptions',
+        //         'errors' => [],
+        //     ], 422);
+        // }
+
+        $customer->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Customer deleted successfully',
+            'data' => null,
+        ]);
+    }
+
+    public function changeStatus(int $customer, Request $request): JsonResponse
+    {
+        $customer = Customer::query()->find($customer);
+
+        if (!$customer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer not found',
+                'errors' => [],
+            ], 404);
+        }
+
+        $activate = $request->query('activate');
+
+        if ($activate === null) {
+            return response()->json([
+                'success' => false,
+                'message' => "Activate parameter is required",
+            ], 400);
+        }
+
+        $customer->update(['status' => $activate === 'true']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Customer status updated successfully',
+            'data' => $customer,
+        ]);
     }
 }

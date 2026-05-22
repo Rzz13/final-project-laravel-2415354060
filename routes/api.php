@@ -9,3 +9,4 @@ Route::patch("services/{service}/change-status", [ServiceController::class, 'cha
 
 // Customer routes
 Route::apiResource('customers', CustomerController::class);
+Route::patch("customers/{customer}/change-status", [CustomerController::class, 'changeCustomerStatus']);
