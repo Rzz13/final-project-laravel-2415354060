@@ -14,4 +14,5 @@ Route::apiResource('customers', CustomerController::class);
 Route::patch("customers/{customer}/change-status", [CustomerController::class, 'changeCustomerStatus']);
 
 // Subscription routes
+Route::get("subscriptions/{status}", [SubscriptionController::class, 'getSubscriptionByStatus']);
 Route::apiResource('subscriptions', SubscriptionController::class);

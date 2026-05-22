@@ -15,7 +15,7 @@ return new class extends Migration
 
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->string('status');
+            $table->enum('status', ['active', 'inactive', 'trial', 'isolir', 'dismantle'])->default('trial');
 
             $table->timestamps();
         });
