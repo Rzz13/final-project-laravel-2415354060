@@ -7,18 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Customer extends Model
 {
     protected $fillable = [
+        'customer_id',
         'name',
         'email',
         'phone',
         'address',
+        'status',
     ];
 
     public function casts(): array
     {
         return [
-            'email' => 'string',
-            'phone' => 'string',
-            'address' => 'string',
+            'status' => 'boolean',
         ];
     }
 
