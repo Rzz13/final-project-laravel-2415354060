@@ -126,26 +126,7 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function getDataById(int $id): JsonResponse
-    {
-        $customer = Customer::query()->find($id);
-
-        if (!$customer) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Customer not found',
-                'errors' => [],
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Customer data retrieved successfully',
-            'data' => $customer,
-        ]);
-    }
-
-    public function getDataByStatus(Request $request): JsonResponse
+    public function getCustomerByStatus(Request $request): JsonResponse
     {
         $status = $request->query('status');
 
