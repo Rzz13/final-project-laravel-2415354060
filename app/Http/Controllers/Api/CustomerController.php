@@ -11,24 +11,9 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
-        $status = $request->query('status');
         $query = Customer::query();
-
-        if ($status !== null) {
-            if (!in_array($status, ['active', 'inactive'], true)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation failed',
-                    'errors' => [
-                        'status' => ['The selected status is invalid.']
-                    ]
-                ], 422);
-            }
-
-            $query->where('status', $status === 'active');
-        }
 
         $customers = $query->latest()->get();
 
@@ -38,6 +23,7 @@ class CustomerController extends Controller
             'data' => $customers,
         ]);
     }
+
 
     public function store(Request $request): JsonResponse
     {
@@ -140,7 +126,40 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function changeStatus(int $customer, Request $request): JsonResponse
+    public function getCustomerByStatus(Request $request): JsonResponse
+    {
+        $status = $request->query('status');
+
+        if ($status === null) {
+            return response()->json([
+                'success' => false,
+                'message' => "Status parameter is required",
+            ], 400);
+        }
+
+        if (!in_array($status, ['active', 'inactive'], true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => [
+                    'status' => ['The selected status is invalid.']
+                ]
+            ], 422);
+        }
+
+        $customers = Customer::query()
+            ->where('status', $status === 'active')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Customers with status '{$status}' retrieved successfully",
+            'data' => $customers,
+        ]);
+    }
+
+    public function changeCustomerStatus(int $customer, Request $request): JsonResponse
     {
         $customer = Customer::query()->find($customer);
 
