@@ -1086,13 +1086,5 @@ curl -X PATCH http://localhost:8000/api/subscriptions/1/change-status \
 ### 8. Subscriptions Page - Status Dropdown
 ![Subscriptions Page - Status Dropdown](docs/screenshots/web/08-subscriptions-status-dropdown.png)
 
----
-
-# 📞 Support
-
-Untuk pertanyaan atau issue, silakan hubungi tim development atau buat issue di repository.
-
----
-
 **Last Updated**: May 2026
 **Version**: 1.0.0
