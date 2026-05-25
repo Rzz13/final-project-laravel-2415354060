@@ -1,5 +1,11 @@
 # ERP API - Dokumentasi Project
 
+<!-- PROJECT LEAD -->
+
+- **Nama**: Muhamad Rizqi Assabiquunal Awwalun
+- **Nim**: 2415354060
+- **Prodi**: TRPL
+
 ## 📋 Deskripsi Project
 
 ERP API adalah aplikasi manajemen berbasis Laravel yang menyediakan sistem untuk mengelola **Customers**, **Services**, dan **Subscriptions**. Aplikasi ini menyediakan REST API lengkap dan interface web untuk operasi CRUD (Create, Read, Update, Delete).
