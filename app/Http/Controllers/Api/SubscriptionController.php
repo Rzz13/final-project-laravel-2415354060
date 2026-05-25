@@ -110,6 +110,15 @@ class SubscriptionController extends Controller
             'status' => ['required', 'string', Rule::in(['active', 'inactive', 'trial', 'isolir', 'dismantle'])],
         ]);
 
+        // VALIDATE STATUS CANNOT CHANGE TO OTHER STATUS IF ALREADY DISMANTLE
+        if ($subscription->status === 'dismantle' && $data['status'] !== 'dismantle') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot change status from dismantle to other status',
+                'errors' => [],
+            ], 400);
+        }
+
         $subscription->update(['status' => $data['status']]);
         $subscription->makeHidden(['customer', 'service']);
 
